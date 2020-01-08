@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import random
+import math
 
 def read_file_into_string(input_file, from_ord, to_ord):
     # take a file "input_file", read it character by character, strip away all unwanted
@@ -111,7 +112,7 @@ def make_distance_matrix_symmetric(num_cities):
 ############ supplied internally as the default file or via a command line execution.      ############
 ############ if your input file does not exist then the program will crash.                ############
 
-input_file = "AISearchfile175.txt"
+input_file = "AISearchfile042.txt"
 
 #######################################################################################################
 
@@ -210,23 +211,48 @@ codes_and_names = {'BF' : 'brute-force search',
 ############    now the code for your algorithm should begin                               ############
 #######################################################################################################
 
-#distance_matrix[][]" where "num_cities
-
-print("Distance Matrix: \n")
-print(distance_matrix)
-print("Number of cities: " + str(num_cities))
+tour = []
+tour_length = 0
 
 #Aiming for IDA*
 #Start with ID, then add heuristic
 
+#represent state as an array of city indices, first element is the intial city. - these represent a partial tour.
+#A transition is adding on a new city to a partial tour.
 
 
+def greedy(initialCity, distanceMatrix, numCities):
+    state = [initialCity]
+    while len(state) < numCities:
+        currentCity = state[len(state)-1]
+
+        best = -1
+        bestScore = math.inf
+        for x in range(num_cities):
+            if x not in state:
+                if distance_matrix[x][currentCity] < bestScore:
+                    bestScore = distance_matrix[x][currentCity]
+                    best = x
+        state.append(best)
+    return state
+
+def getTourLength(distanceMatrix, numCities, tour):
+    length = distanceMatrix[tour[0]][tour[num_cities-1]]
+    for x in range(0, numCities-1):
+        length += distanceMatrix[tour[x]][tour[x+1]]
+    return length
 
 
+#runs a search function with the parameters initialCity, distanceMatrix, numCities, and prints the result.
+#then saves the result into the required global variables for the skeleton program to work
+def go(f):
+    global tour, tour_length
+    result = f(0, distance_matrix, num_cities)
+    print(result)
+    tour = result
+    tour_length = getTourLength(distance_matrix, num_cities, tour)
 
-
-
-
+go(greedy)
 
 
 #######################################################################################################
